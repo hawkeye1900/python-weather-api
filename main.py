@@ -17,7 +17,8 @@ def get_weather_data(api, place):
         data = response.json()
 
         if data['cod'] != 200:
-            print(f"Error: {data['message']}")
+            print(f"Error: {data['message']}. You tried {place}. There was no "
+                  f"trace of this city. Check the spelling and that the city exists. ")
             return None
 
         return {
@@ -27,7 +28,8 @@ def get_weather_data(api, place):
         }
 
     except requests.exceptions.RequestException as e:
-        print(f"Error fetching weather data: {e}")
+        print(f"There was an error when fetching weather data for {place}:"
+              f" {e}")
         return None
 
 
