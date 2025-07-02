@@ -1,6 +1,7 @@
 from dotenv import load_dotenv
 import requests
 import os
+from datetime import datetime
 
 # Load environment variables from the .env file
 load_dotenv()
@@ -8,9 +9,11 @@ load_dotenv()
 API_KEY = os.getenv('API_KEY')
 
 
-def get_weather_data(api, place):
-    url = f'http://api.openweathermap.org/data/2.5/weather?q={place}&appid={
-    api}&units=metric'
+def get_current_weather_data(api, place):
+    url = f"""
+        http://api.openweathermap.org/data/2.5/weather?q={place}&appid={
+        api}&units=metric
+    """
 
     try:
         response = requests.get(url)
@@ -23,6 +26,8 @@ def get_weather_data(api, place):
 
         return {
             'city': data['name'],
+            'lat': data['coord']['lat'],
+            'lon': data['coord']['lon'],
             'temp': data['main']['temp'],
             'description': data['weather'][0]['description']
         }
@@ -33,20 +38,64 @@ def get_weather_data(api, place):
         return None
 
 
+def get_5day_forecast(place, api):
+    url = f"""
+    https://api.openweathermap.org/data/2.5/forecast?q={place}&appid={
+    api}&units=metric
+    """
+
+    response = requests.get(url)
+    data = response.json()
+
+    return data
+
+
 def display_weather():
     cities = input("Enter a single city, or enter multiple cities, separated "
-                 "by a comma (e.g Glasgow,Paris,Istanbul): ").split(",")
+                 "by a comma (e.g Glasgow,Paris,Istanbul): \n")
+
+    #  protects against no input or an empty string input
+    if not cities or not cities[0].strip():
+        print("You did not the name of a city.")
+        return
+
+    cities = cities.split(",")
 
     for city in cities:
-        city = city.strip()
-        weather = get_weather_data(API_KEY, city)
+        city = city.strip().title()
+        weather = get_current_weather_data(API_KEY, city)
 
         if weather:
-            print(f"Weather in {weather['city']}:\n"
+            print(f"Weather in {weather['city']} today:\n"
                   f"Temperature: {weather['temp']}°C\n"
                   f"Description: {weather['description']}\n")
+
+
         else:
             print("Unable to retrieve weather data.")
+            exit()
+
+        forecast = get_5day_forecast(city, API_KEY)
+
+        if forecast:
+            print(f"Displaying the 5-day forecast for {city}.")
+            print("Forecast refers to 0700hrs on the date given\n")
+            weather = forecast['list']
+            for entry in weather:
+                #  Getting the time stamp in utc
+                stamp = (entry['dt'])
+
+                # convert timestamp to date time
+                entry_time = datetime.fromtimestamp(stamp)
+
+                # Selecting entries for 0700hrs each day
+                if entry_time.strftime("%H") == '07':
+                    print(f"{entry_time.strftime("%a %d %b %Y")}:")
+                    print(f"Weather: {entry['weather'][0]['description']}")
+                    print(f"Max Temp: {round(entry['main']['temp_max'] 
+                                             - 273.15, 2)}\u00b0C")
+                    print(f"Max Temp: {round(entry['main']['temp_min']
+                                             - 273.15, 2)}\u00b0C\n")
 
 
 if __name__ == "__main__":
