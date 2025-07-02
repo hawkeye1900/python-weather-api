@@ -1,18 +1,11 @@
-from dotenv import load_dotenv
 import requests
-import os
 from datetime import datetime
 from sys import exit
+from api import API_KEY
 
-# Load environment variables from the .env file
-load_dotenv()
-
-# Retrieve the api key
-API_KEY = os.getenv('API_KEY')
 if not API_KEY:
     print("Error: API key not found")
     exit(1)
-
 
 def get_current_weather_data(api, place):
     params = {'q': place, 'appid': api, 'units': 'metric'}
