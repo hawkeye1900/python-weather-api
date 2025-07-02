@@ -54,13 +54,11 @@ def get_5day_forecast(place, api):
 
 
 def display_weather():
-    cities = input("Enter a single city, or enter multiple cities, separated "
-                 "by a comma (e.g Glasgow,Paris,Istanbul): \n")
-
-    #  protects against no input or an empty string input
-    if not cities or not cities[0].strip():
-        print("You pressed ENTER before adding a city.")
-        return
+    # protects against no input or an empty string input
+    cities = ""
+    while not cities or not cities[0].strip(",") or not cities[0].strip(" "):
+        cities = input("Enter a single city, or enter multiple cities separated "
+                       "by a comma (e.g Glasgow,Paris,Istanbul): \n")
 
     cities = cities.split(",")
 
