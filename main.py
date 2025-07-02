@@ -2,6 +2,7 @@ from dotenv import load_dotenv
 import requests
 import os
 from datetime import datetime
+from sys import exit
 
 # Load environment variables from the .env file
 load_dotenv()
@@ -20,9 +21,11 @@ def get_current_weather_data(api, place):
         data = response.json()
 
         if data['cod'] != 200:
-            print(f"Error: {data['message']}. You tried {place}. There was no "
-                  f"trace of this city. Check the spelling and that the city exists. ")
-            return None
+            print(f"Error: {data['message'].capitalize()}. You tried {place}. "
+                  f"There was no "
+                  f"trace of this city. Check the spelling and that the city "
+                  f"exists.")
+            exit(1)
 
         return {
             'city': data['name'],
@@ -56,7 +59,7 @@ def display_weather():
 
     #  protects against no input or an empty string input
     if not cities or not cities[0].strip():
-        print("You did not the name of a city.")
+        print("You pressed ENTER before adding a city.")
         return
 
     cities = cities.split(",")
@@ -69,7 +72,6 @@ def display_weather():
             print(f"Weather in {weather['city']} today:\n"
                   f"Temperature: {weather['temp']}°C\n"
                   f"Description: {weather['description']}\n")
-
 
         else:
             print("Unable to retrieve weather data.")
