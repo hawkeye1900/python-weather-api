@@ -9,6 +9,9 @@ load_dotenv()
 
 # Retrieve the api key
 API_KEY = os.getenv('API_KEY')
+if not API_KEY:
+    print("Error: API key not found")
+    exit(1)
 
 
 def get_current_weather_data(api, place):
@@ -19,12 +22,9 @@ def get_current_weather_data(api, place):
         response = requests.get(url, params)
         data = response.json()
 
-        if data['cod'] != 200:
-            print(f"Error: {data['message'].capitalize()}. You tried {place}. "
-                  f"There was no "
-                  f"trace of this city. Check the spelling and that the city "
-                  f"exists.")
-            exit(1)
+        # raise an exception if the HTTP response contains a client error
+        # (4xx) or a server error (5xx) status code
+        response.raise_for_status()
 
         return {
             'city': data['name'],
@@ -34,10 +34,16 @@ def get_current_weather_data(api, place):
             'description': data['weather'][0]['description']
         }
 
+    except requests.exceptions.HTTPError as e:
+        print(f"The following HTTP error occurred.\n{e}.")
+        print("Try checking the spelling of your city before running the "
+              "program again.")
+        exit(-1)
+
     except requests.exceptions.RequestException as e:
         print(f"There was an error when fetching weather data for {place}:"
               f" {e}")
-        return None
+        exit(-1)
 
 
 def get_5day_forecast(place, api):
