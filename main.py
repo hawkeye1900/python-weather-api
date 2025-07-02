@@ -12,11 +12,11 @@ API_KEY = os.getenv('API_KEY')
 
 
 def get_current_weather_data(api, place):
-    url = f"http://api.openweathermap.org/data/2.5/weather?q={place}&appid={
-        api}&units=metric"
+    params = {'q': place, 'appid': api, 'units': 'metric'}
+    url = "http://api.openweathermap.org/data/2.5/weather"
 
     try:
-        response = requests.get(url)
+        response = requests.get(url, params)
         data = response.json()
 
         if data['cod'] != 200:
@@ -41,12 +41,10 @@ def get_current_weather_data(api, place):
 
 
 def get_5day_forecast(place, api):
-    url = f"""
-    https://api.openweathermap.org/data/2.5/forecast?q={place}&appid={
-    api}&units=metric
-    """
+    params = {'q': place, 'appid': api, 'units': 'metric'}
+    url = "https://api.openweathermap.org/data/2.5/forecast"
 
-    response = requests.get(url)
+    response = requests.get(url, params)
     data = response.json()
 
     return data
