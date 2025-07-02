@@ -7,14 +7,13 @@ from sys import exit
 # Load environment variables from the .env file
 load_dotenv()
 
+# Retrieve the api key
 API_KEY = os.getenv('API_KEY')
 
 
 def get_current_weather_data(api, place):
-    url = f"""
-        http://api.openweathermap.org/data/2.5/weather?q={place}&appid={
-        api}&units=metric
-    """
+    url = f"http://api.openweathermap.org/data/2.5/weather?q={place}&appid={
+        api}&units=metric"
 
     try:
         response = requests.get(url)
@@ -80,6 +79,7 @@ def display_weather():
         if forecast:
             print(f"Displaying the 5-day forecast for {city}.")
             print("Forecast refers to 0700hrs on the date given\n")
+
             weather = forecast['list']
             for entry in weather:
                 #  Getting the time stamp in utc
